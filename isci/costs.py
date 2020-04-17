@@ -1,4 +1,8 @@
-import numpy as np
+import math
+
+
+def dot(a, b):
+    return a[0]*b[0] + a[1]*b[1]
 
 
 def get_gradient_direction(p, q, Gx, Gy):
@@ -6,14 +10,17 @@ def get_gradient_direction(p, q, Gx, Gy):
     p, q: pixels coords
     Gx, Gy: normalized grads
     """
-    Dp = np.array([Gy[p[0], p[1]], -Gx[p[0], p[1]]])
-    Dq = np.array([Gy[q[0], q[1]], -Gx[q[0], q[1]]])
+    Dp = (Gy[p[0], p[1]], -Gx[p[0], p[1]])
+    Dq = (Gy[q[0], q[1]], -Gx[q[0], q[1]])
+    v = (q[0] - p[0], q[1] - p[1])
 
-    p, q = np.array(p), np.array(q)
-    norm = 1 / np.sqrt(np.sum((p - q) ** 2))
-    L = norm * (p - q) if np.dot(Dp, q - p) < 0 else norm * (q - p)
+    if dot(Dp, v) < 0:
+        v = (-v[0], -v[1])
 
-    return (2 / 3) * np.pi * (np.arccos(np.dot(Dp, L)) + np.arccos(np.dot(L, Dq)))
+    inv_norm = 1 / (v[0] ** 2 + v[1] ** 2) ** (1/2)
+    L = (inv_norm * v[0], inv_norm * v[1])
+
+    return (2 / 3) * math.pi * (math.acos(dot(Dp, L)) + math.acos(dot(L, Dq)))
 
 
 def get_local_cost(q, p, **precomp):

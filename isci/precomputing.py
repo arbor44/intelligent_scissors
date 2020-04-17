@@ -11,6 +11,9 @@ def get_grads(image):
 
 
 def get_normalized_grads(Gx, Gy):
+    """
+    Gx, Gy: non-normalized grads
+    """
     G = np.sqrt(Gx ** 2 + Gy ** 2)
     inv_G = np.zeros_like(G)
     inv_G[G > 0] = G[G > 0]

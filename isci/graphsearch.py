@@ -1,42 +1,41 @@
-import numpy as np
 from .costs import get_local_cost
-from itertools import product
 
 
-def get_neighbours(point, shape):
+def get_neighbour(point, shape):
     neighbours = []
-    for i in product((0, 1, -1), repeat=2):
-        if np.sum(np.abs(i)) > 0:
-            neighbour = np.array(point) + np.array(i)
-            if (not any((neighbour - shape) >= 0)) & (not any(neighbour < 0)):
-                neighbours.append(tuple(neighbour))
-                if any(neighbour < 0):
-                    print(not any(neighbour < 0))
-                    print(neighbour)
+    for i in [(0, 1), (0, -1), (1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1)]:
+        neighbour = (point[0] + i[0], point[1] + i[1])
+        boundary_cross = (neighbour[0] >= shape[0] or neighbour[0] < 0) + (neighbour[1] >= shape[1] or neighbour[1] < 0)
+        if boundary_cross == 0:
+            neighbours.append(neighbour)
     return neighbours
 
 
 def path_search(seed_point, shape, **precomp):
     pointers = {}
-    active_pixels, expanded = {seed_point: 0}, []
-    while len(active_pixels) > 0:
+    active_pixels, expanded = {seed_point: 0}, set()
+    length = 1
+    while length > 0:
         min_pxl, min_cost = min(active_pixels.items(), key=lambda x: x[1])
         del active_pixels[min_pxl]
+        length -= 1
 
         if min_pxl not in expanded:
-            expanded.append(min_pxl)
+            expanded.add(min_pxl)
 
-        for n in get_neighbours(min_pxl, shape):
+        for n in get_neighbour(min_pxl, shape):
             if n in expanded:
                 pass
             else:
                 cost = min_cost + get_local_cost(min_pxl, n, **precomp)
-                if n in active_pixels.keys():
+                if active_pixels.get(n) is not None:
                     if cost < active_pixels.get(n):
                         del active_pixels[n]
+                        length -= 1
 
-                if n not in active_pixels.keys():
+                if active_pixels.get(n) is None:
                     active_pixels[n] = cost
+                    length += 1
                     pointers[n] = min_pxl
 
     return pointers
