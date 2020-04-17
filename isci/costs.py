@@ -5,6 +5,11 @@ def dot(a, b):
     return a[0]*b[0] + a[1]*b[1]
 
 
+def check_value(a):
+    abs_val = math.fabs(a)
+    return a / abs_val if abs_val > 1 else a
+
+
 def get_gradient_direction(p, q, Gx, Gy):
     """
     p, q: pixels coords
@@ -20,7 +25,7 @@ def get_gradient_direction(p, q, Gx, Gy):
     inv_norm = 1 / (v[0] ** 2 + v[1] ** 2) ** (1/2)
     L = (inv_norm * v[0], inv_norm * v[1])
 
-    return (2 / 3) * math.pi * (math.acos(dot(Dp, L)) + math.acos(dot(L, Dq)))
+    return (2 / 3) * math.pi * (math.acos(check_value(dot(Dp, L))) + math.acos(check_value(dot(L, Dq))))
 
 
 def get_local_cost(q, p, **precomp):

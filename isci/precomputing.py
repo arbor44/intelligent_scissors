@@ -16,7 +16,8 @@ def get_normalized_grads(Gx, Gy):
     """
     G = np.sqrt(Gx ** 2 + Gy ** 2)
     inv_G = np.zeros_like(G)
-    inv_G[G > 0] = G[G > 0]
+    inv_G[G > 0] = 1 / G[G > 0]
+
     return Gx * inv_G, Gy * inv_G
 
 
